@@ -80,7 +80,12 @@ This repo mirrors the branch/release model of the main Kintai repo:
   `KintaiBundleDev/`, matching the relative path in `composer.json`), lints
   every `.php` file (`php -l`), validates `bundle.json`/`lang/*.json` as JSON,
   then runs `composer install` and the real `vendor/bin/phpunit` suite — see
-  "Running tests" above.
+  "Running tests" above. It pins the Kintai checkout to `develop`, not
+  `main` (Kintai's actual GitHub default branch) — this bundle's Core
+  dependencies (`NotebookEntryRepositoryInterface`, `BundleMigrationRunner`)
+  only exist there for now. Update that `ref:` once a Kintai release
+  actually ships them through `alpha`/`beta`/`main`, and set `bundle.json`'s
+  `kintai_core.min` to that version at the same time.
 - Merging into any of the three branches triggers
   `.github/workflows/release.yml`, which tags and publishes a GitHub Release
   — see "Release process" below.

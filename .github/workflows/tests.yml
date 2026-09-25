@@ -29,6 +29,12 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: AudricSan/Kintai
+          # develop, not main (Kintai's actual default branch): this bundle's
+          # NotebookEntryRepositoryInterface/BundleMigrationRunner dependencies
+          # only exist on develop for now, not yet promoted through
+          # alpha/beta/main — bump this once a Kintai release ships them and
+          # kintai_core.min in bundle.json can name that version instead.
+          ref: develop
           path: Kintai
 
       - name: Setup PHP
