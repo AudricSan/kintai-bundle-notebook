@@ -24,6 +24,8 @@ database/migrations/            # creates the notebook_entries table (see CLAUDE
 Views/notebook.php              # list / management page
 lang/{en,fr,ja}.json            # bundle-specific translation keys
 routes.php                      # loaded by NotebookBundle::register() via loadRoutesFrom()
+tests/                          # real PHPUnit suite (unusual for a Kintai bundle — see CLAUDE.md#running-tests)
+composer.json                   # test-only tooling; never used at runtime (Kintai loads this bundle dynamically, not via Composer)
 ```
 
 ## Releasing a new version
