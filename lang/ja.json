@@ -1,0 +1,20 @@
+{
+    "bundle_notebook": "ノート",
+    "bundle_notebook_desc": "チームノート — 管理者・従業員ダッシュボードに表示されるメッセージ、ピン留め、自動有効期限。",
+    "error_notebook_entry_not_found": "ノートが見つかりません。",
+    "error_notebook_forbidden": "このノートに対してこの操作を行う権限がありません。",
+    "notebook_content": "メッセージ",
+    "notebook_created": "ノートを公開しました。",
+    "notebook_delete_confirm": "このノートを完全に削除しますか？",
+    "notebook_deleted": "ノートを削除しました。",
+    "notebook_error_empty_content": "メッセージを空にすることはできません。",
+    "notebook_hide_expired": "期限切れを非表示",
+    "notebook_new_entry": "新しいノート",
+    "notebook_pin": "ピン留め",
+    "notebook_publish": "公開",
+    "notebook_show_expired": "期限切れを表示",
+    "notebook_unpin": "ピン留め解除",
+    "notebook_updated": "ノートを更新しました。",
+    "notif_notebook_entry_created": "新しいノート",
+    "notif_notebook_entry_created_body": "ノートに新しいメッセージが投稿されました。"
+}

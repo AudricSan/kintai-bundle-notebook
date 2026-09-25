@@ -1,0 +1,20 @@
+{
+    "bundle_notebook": "Notebook",
+    "bundle_notebook_desc": "Team notebook — messages shown on the admin and employee dashboards, pinning, automatic expiration.",
+    "error_notebook_entry_not_found": "Note not found.",
+    "error_notebook_forbidden": "You're not allowed to perform this action on this note.",
+    "notebook_content": "Message",
+    "notebook_created": "Note published.",
+    "notebook_delete_confirm": "Permanently delete this note?",
+    "notebook_deleted": "Note deleted.",
+    "notebook_error_empty_content": "The message can't be empty.",
+    "notebook_hide_expired": "Hide expired",
+    "notebook_new_entry": "New note",
+    "notebook_pin": "Pin",
+    "notebook_publish": "Publish",
+    "notebook_show_expired": "Show expired",
+    "notebook_unpin": "Unpin",
+    "notebook_updated": "Note updated.",
+    "notif_notebook_entry_created": "New note",
+    "notif_notebook_entry_created_body": "A new note was published in the notebook."
+}

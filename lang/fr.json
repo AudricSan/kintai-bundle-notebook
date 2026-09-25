@@ -1,0 +1,20 @@
+{
+    "bundle_notebook": "Carnet de notes",
+    "bundle_notebook_desc": "Carnet de notes d'équipe — messages visibles sur les dashboards admin et employé, épinglage, expiration automatique.",
+    "error_notebook_entry_not_found": "Note introuvable.",
+    "error_notebook_forbidden": "Vous n'avez pas le droit d'effectuer cette action sur cette note.",
+    "notebook_content": "Message",
+    "notebook_created": "Note publiée.",
+    "notebook_delete_confirm": "Supprimer cette note définitivement ?",
+    "notebook_deleted": "Note supprimée.",
+    "notebook_error_empty_content": "Le message ne peut pas être vide.",
+    "notebook_hide_expired": "Masquer les expirées",
+    "notebook_new_entry": "Nouvelle note",
+    "notebook_pin": "Épingler",
+    "notebook_publish": "Publier",
+    "notebook_show_expired": "Afficher les expirées",
+    "notebook_unpin": "Désépingler",
+    "notebook_updated": "Note modifiée.",
+    "notif_notebook_entry_created": "Nouvelle note",
+    "notif_notebook_entry_created_body": "Une nouvelle note a été publiée dans le carnet de notes."
+}
