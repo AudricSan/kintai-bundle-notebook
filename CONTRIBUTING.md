@@ -48,17 +48,23 @@ same terms.
 
 ## Running Checks Locally
 
-There is no PHPUnit suite in this repo (see [CLAUDE.md](CLAUDE.md) for why).
-Before opening a PR, run what CI runs:
+Unlike most Kintai bundles, this repo ships a real PHPUnit suite — see
+[CLAUDE.md](CLAUDE.md#running-tests) for the one-time setup (it needs a
+sibling checkout of `AudricSan/Kintai`). Before opening a PR, run what CI runs:
 
 ```bash
-find src Views database -name '*.php' -print0 | xargs -0 -n1 php -l
+find src Views database tests -name '*.php' -print0 | xargs -0 -n1 php -l
 php -l routes.php
 for f in bundle.json lang/*.json; do jq empty "$f"; done
+composer install
+vendor/bin/phpunit
 ```
 
-Functional testing requires installing the bundle into a real Kintai
-instance — there's no way to exercise the controllers standalone.
+Add a test alongside any new/changed controller or migration logic — see
+existing files under `tests/` for the conventions. This still doesn't replace
+installing the bundle into a real running Kintai instance for a final check
+before release: routing, view rendering, RBAC middleware, and the actual
+configured database driver are all outside what these tests exercise.
 
 ## Where to look first
 

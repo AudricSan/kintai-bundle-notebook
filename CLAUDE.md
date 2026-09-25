@@ -14,20 +14,58 @@ registry, installer), but is the first bundle to ship its own database schema
 via the `database/migrations/` mechanism (see "Architecture" below) rather
 than depending on a table Kintai Core already provides.
 
-There is no build or test suite in this repo (no `composer.json`, no
-PHPUnit). The code is not runnable or functionally testable standalone: every
-class under `src/` depends on `kintai\Core\*` (repositories, middleware,
-`Request`/`Response`, `ViewRenderer`, `PermissionService`, etc.) that only
-exist inside a running Kintai instance. Verifying a behavior change means
-installing the bundle into a real Kintai instance, not running anything in
-this repo. CI here only checks PHP syntax and manifest validity (see
-"CI and branches" below) — it cannot catch logic errors.
+Unlike every other Kintai bundle, this repo **does** ship a real PHPUnit
+suite (`tests/`) — see "Running tests" below for how. Nothing here is a
+reimplementation or fake of Kintai Core: `composer.json`'s `autoload-dev`
+maps the `kintai\` namespace root straight to the real Kintai repository's
+`src/` via a relative path (`../../Kintai/src/`), the same sibling-repo
+layout `KintaiBundleDev/` already uses locally — so `Request`/`Response`,
+`PermissionService`, the repository interfaces, `Database\Migration`, and
+everything else this bundle's classes depend on are the actual Core classes,
+just never booted into a running app (no HTTP layer, no real database beyond
+an in-memory SQLite `Capsule` tests set up themselves, no `Application`
+instance). Tests mock only what a running app would inject (repositories,
+`NotificationService`) — never Core's own logic. This still can't replace
+installing the bundle into a real running instance for a final check (routing,
+views, RBAC middleware, and anything actually hitting the configured database
+driver are all out of scope for these tests), but it exercises every
+controller's actual decision logic (authorization branches, scope
+resolution, notification recipients) and the migration file itself, without
+that step.
 
 Kintai never `git clone`/`pull`s bundles (many shared-hosting environments
 have no `git` CLI available to PHP) — `BundleInstallerService` always
 downloads a tagged GitHub Release's zipball. This repo's only "build output"
 is therefore the GitHub Release itself; nothing here gets compiled or
 packaged.
+
+## Running tests
+
+```bash
+composer install
+vendor/bin/phpunit
+```
+
+Requires a checkout of [`AudricSan/Kintai`](https://github.com/AudricSan/Kintai)
+at `../../Kintai` relative to this repo's root — exactly the layout this repo
+already has locally inside `KintaiBundleDev/` (this repo and `Kintai/` as
+siblings). Nothing else to configure: no database, no `.env`, no booted
+`Application`. `tests/` mirrors `src/`'s structure (`Controllers/Web/`,
+`Controllers/Api/`, plus `Database/` for the migration test) and follows the
+same conventions as Kintai's own test suite — mock the repository interfaces
+and `NotificationService`, construct a real `PermissionService` with mocked
+`RoleAssignmentRepositoryInterface`/`RoleRepositoryInterface` rather than
+mocking `PermissionService` itself (it's `final`, and mocking it would test
+nothing about how RBAC actually resolves), use `ReflectionProperty` to set
+`Request`'s private `jsonBody` for API tests and to read `Response`'s private
+`headers['Location']` for redirect assertions — see any existing test file
+for the exact pattern. The migration test instantiates the real
+`kintai\Core\Database\BundleMigrationRunner` against an in-memory SQLite
+`Capsule` (same reflection-based construction technique as Kintai's own
+`BundleMigrationRunnerTest`) rather than asserting anything about the
+migration file's contents directly — it proves the file actually produces
+the right schema through the exact mechanism `BundleInstallerService` uses at
+install time, not just that it's syntactically valid.
 
 ## CI and branches
 
@@ -36,10 +74,13 @@ This repo mirrors the branch/release model of the main Kintai repo:
 - `main`, `alpha`, and `beta` are protected branches — no direct push; land
   changes via a PR (see `CONTRIBUTING.md`). New work targets `alpha` (the
   active channel); promote a line forward by merging `alpha` → `beta` → `main`.
-- `.github/workflows/tests.yml` runs a `test` job (PHP syntax check via
-  `php -l` on every `.php` file under `src/`, `Views/`, and `database/`, plus
-  JSON validation of `bundle.json` and `lang/*.json`) on every push and PR to
-  these branches. This is the required status check gating merges.
+- `.github/workflows/tests.yml` runs a `test` job on every push and PR to
+  these branches — this is the required status check gating merges. It checks
+  out this repo AND `AudricSan/Kintai` side by side (`Kintai` as a sibling of
+  `KintaiBundleDev/`, matching the relative path in `composer.json`), lints
+  every `.php` file (`php -l`), validates `bundle.json`/`lang/*.json` as JSON,
+  then runs `composer install` and the real `vendor/bin/phpunit` suite — see
+  "Running tests" above.
 - Merging into any of the three branches triggers
   `.github/workflows/release.yml`, which tags and publishes a GitHub Release
   — see "Release process" below.
