@@ -21,8 +21,8 @@ use kintai\Bundles\Installed\Notebook\Controllers\Api\NotebookController as ApiN
 // accessibles à qui détient la permission, où qu'il/elle soit dans l'app.
 
 $router->group('/notebook', function ($r) {
-    $r->get('/',              [NotebookController::class, 'index'],     name: 'notebook.index',      permission: 'notebook.view');
-    $r->post('/',              [NotebookController::class, 'store'],     name: 'notebook.store',      permission: 'notebook.create');
+    $r->get('',                [NotebookController::class, 'index'],     name: 'notebook.index',      permission: 'notebook.view');
+    $r->post('',               [NotebookController::class, 'store'],     name: 'notebook.store',      permission: 'notebook.create');
     $r->post('/{id}/update',  [NotebookController::class, 'update'],    name: 'notebook.update',     permission: 'notebook.create');
     $r->post('/{id}/delete',  [NotebookController::class, 'destroy'],   name: 'notebook.delete',     permission: 'notebook.create');
     $r->post('/{id}/pin',     [NotebookController::class, 'togglePin'], name: 'notebook.pin',         permission: 'notebook.manage');
