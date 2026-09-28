@@ -16,5 +16,5 @@
     "notebook_unpin": "Unpin",
     "notebook_updated": "Note updated.",
     "notif_notebook_entry_created": "New note",
-    "notif_notebook_entry_created_body": "A new note was published in the notebook."
+    "notif_notebook_entry_created_body": "New note from :author: \":excerpt\""
 }

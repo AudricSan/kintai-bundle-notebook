@@ -134,7 +134,15 @@ final class NotebookControllerTest extends TestCase
 
         $this->storeUsers->method('findByStore')->with(1)->willReturn([['user_id' => 9, 'store_id' => 1]]);
         $this->users->method('findById')->with(9)->willReturn(['id' => 9]);
-        $this->notifs->expects($this->once())->method('notifyMany')->with([9], 'notebook_entry_created', 'notif_notebook_entry_created_body', [], 42);
+        $this->users->method('findAll')->willReturn([['id' => 9, 'first_name' => 'Jean', 'last_name' => 'Dupont']]);
+        $this->notifs->expects($this->once())->method('notifyMany')->with(
+            [9],
+            'notebook_entry_created',
+            'notif_notebook_entry_created_body',
+            ['author' => 'Dupont Jean', 'excerpt' => 'Bonjour équipe'],
+            42,
+            '/notebook'
+        );
 
         $response = $this->controller->store($this->request(9, [1]));
 
@@ -185,8 +193,9 @@ final class NotebookControllerTest extends TestCase
             [1, 2],
             'notebook_entry_created',
             'notif_notebook_entry_created_body',
-            [],
+            ['author' => '#1', 'excerpt' => 'Pour tous'],
             7,
+            '/notebook'
         );
 
         $response = $this->controller->store($this->request(1, null));

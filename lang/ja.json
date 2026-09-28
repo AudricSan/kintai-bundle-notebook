@@ -16,5 +16,5 @@
     "notebook_unpin": "ピン留め解除",
     "notebook_updated": "ノートを更新しました。",
     "notif_notebook_entry_created": "新しいノート",
-    "notif_notebook_entry_created_body": "ノートに新しいメッセージが投稿されました。"
+    "notif_notebook_entry_created_body": ":author さんが新しいノートを投稿しました：「:excerpt」"
 }
