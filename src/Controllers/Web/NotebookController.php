@@ -129,7 +129,7 @@ final class NotebookController
             $userId
         );
 
-        $this->notifyMembers($storeId, (int) ($saved['id'] ?? 0));
+        $this->notifyMembers($storeId, (int) ($saved['id'] ?? 0), $userId, $content);
 
         return Response::redirect($this->base() . '/notebook?success=created');
     }
@@ -222,7 +222,7 @@ final class NotebookController
     }
 
     /** Notifie les utilisateurs ayant notebook.view — membres du store si scopée, tout le monde si organisation. */
-    private function notifyMembers(?int $storeId, int $referenceId): void
+    private function notifyMembers(?int $storeId, int $referenceId, int $authorId, string $content): void
     {
         $recipients = [];
         if ($storeId !== null) {
@@ -240,7 +240,17 @@ final class NotebookController
             }
         }
         if ($recipients !== []) {
-            $this->notifs->notifyMany($recipients, 'notebook_entry_created', 'notif_notebook_entry_created_body', [], $referenceId);
+            $usersMap   = $this->buildUsersMap();
+            $authorName = $usersMap[$authorId] ?? ('#' . $authorId);
+            $excerpt    = mb_strimwidth($content, 0, 80, '…');
+            $this->notifs->notifyMany(
+                $recipients,
+                'notebook_entry_created',
+                'notif_notebook_entry_created_body',
+                ['author' => $authorName, 'excerpt' => $excerpt],
+                $referenceId,
+                '/notebook'
+            );
         }
     }
 
