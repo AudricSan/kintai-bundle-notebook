@@ -16,5 +16,5 @@
     "notebook_unpin": "Désépingler",
     "notebook_updated": "Note modifiée.",
     "notif_notebook_entry_created": "Nouvelle note",
-    "notif_notebook_entry_created_body": "Une nouvelle note a été publiée dans le carnet de notes."
+    "notif_notebook_entry_created_body": "Nouvelle note de :author : « :excerpt »"
 }
