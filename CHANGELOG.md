@@ -8,6 +8,16 @@ Le schéma de version (X.Y.Z, canaux alpha/beta/main) est décrit dans
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-09-29
+
+### Fixed
+
+- `routes.php` : la route d'index (`GET /notebook`) et la route de création (`POST /notebook`) étaient déclarées avec le motif `/` à l'intérieur du groupe `/notebook`, ce qui compilait en `/notebook/` — un chemin que `Router::dispatch()` ne peut jamais atteindre puisqu'il normalise systématiquement l'URI entrante en retirant le `/` final. Résultat : `GET /notebook` renvoyait toujours `No route matches`, même bundle activé. Aucun autre bundle Kintai n'utilise ce motif pour sa route d'index (voir par ex. `timeoff`/`store-photos`, qui nomment le segment complet) — corrigé en utilisant le motif vide `''` pour hériter du préfixe du groupe tel quel.
+
+### Changed
+
+- La notification envoyée à la publication d'une note ne disait rien de son contenu et ne menait nulle part au clic. Utilise le nouveau `$link` de `NotificationService::notify()` (Kintai Core, PR séparée) pour renvoyer vers `/notebook`, et enrichit le corps du message avec l'auteur et un extrait de la note (`notif_notebook_entry_created_body` gagne les placeholders `:author`/`:excerpt`, fr/en/ja). **Nécessite** la version de Kintai Core qui introduit le paramètre `$link` sur `notify()`/`notifyMany()` — un appel à 6 arguments contre une version de Core encore sur l'ancienne signature à 5 lèverait une erreur PHP.
+
 ## [1.0.0] - 2026-09-26
 
 ### Added
