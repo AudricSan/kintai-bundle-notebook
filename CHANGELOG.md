@@ -8,6 +8,8 @@ Le schéma de version (X.Y.Z, canaux alpha/beta/main) est décrit dans
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-09-29
+
 ### Fixed
 
 - `routes.php` : la route d'index (`GET /notebook`) et la route de création (`POST /notebook`) étaient déclarées avec le motif `/` à l'intérieur du groupe `/notebook`, ce qui compilait en `/notebook/` — un chemin que `Router::dispatch()` ne peut jamais atteindre puisqu'il normalise systématiquement l'URI entrante en retirant le `/` final. Résultat : `GET /notebook` renvoyait toujours `No route matches`, même bundle activé. Aucun autre bundle Kintai n'utilise ce motif pour sa route d'index (voir par ex. `timeoff`/`store-photos`, qui nomment le segment complet) — corrigé en utilisant le motif vide `''` pour hériter du préfixe du groupe tel quel.
