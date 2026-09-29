@@ -8,6 +8,10 @@ Le schéma de version (X.Y.Z, canaux alpha/beta/main) est décrit dans
 
 ## [Unreleased]
 
+### Changed
+
+- Le CSS du widget (`.notebook-widget-list`/`.notebook-widget-item*`) vivait physiquement dans Kintai Core (`public/assets/css/src/components/notebook.css`), pas dans ce dépôt — le bundle en dépendait silencieusement sans jamais le fournir lui-même, cassant l'isolation que la distribution en dépôt séparé est censée garantir. Il vit maintenant dans `public/css/notebook.css`, servi via le nouveau mécanisme `Bundle::loadAssetsFrom()`/`bundle_asset()` de Kintai Core, chargé par `Views/notebook.php` **et** par le widget dashboard natif du Core (qui s'aligne désormais sur ce fichier au lieu d'en garder sa propre copie). **Nécessite** `kintai_core.min: "0.2.0"` (voir `docs/creating-a-bundle.md`'s "Assets" côté Core).
+
 ## [1.1.0] - 2026-09-29
 
 ### Fixed

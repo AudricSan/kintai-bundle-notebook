@@ -35,6 +35,7 @@ final class NotebookBundle extends Bundle
         $this->registerServices();
         $this->loadViewsFrom($this->getPath() . '/Views', 'notebook');
         $this->loadRoutesFrom($this->getPath() . '/routes.php');
+        $this->loadAssetsFrom('public');
     }
 
     private function registerServices(): void

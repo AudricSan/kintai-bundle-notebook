@@ -20,6 +20,10 @@ $show_expired ??= false;
 $can_create   ??= false;
 ?>
 
+<?php if ($notebookCss = bundle_asset('notebook', 'css/notebook.css')): ?>
+<link rel="stylesheet" href="<?= $notebookCss ?>">
+<?php endif; ?>
+
 <div class="page-header">
     <h2 class="page-header__title"><?= __('bundle_notebook') ?></h2>
     <a href="<?= route_url('notebook.index') ?>?show_expired=<?= $show_expired ? '0' : '1' ?>" class="btn btn--ghost btn--sm">
