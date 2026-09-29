@@ -17,7 +17,7 @@ final class NotebookBundle extends Bundle
 
     public function getVersion(): string
     {
-        return '1.0.0';
+        return '1.1.0';
     }
 
     public function getLabel(): string
@@ -35,6 +35,7 @@ final class NotebookBundle extends Bundle
         $this->registerServices();
         $this->loadViewsFrom($this->getPath() . '/Views', 'notebook');
         $this->loadRoutesFrom($this->getPath() . '/routes.php');
+        $this->loadAssetsFrom('public');
     }
 
     private function registerServices(): void
