@@ -10,6 +10,10 @@ Le schéma de version (X.Y.Z, canaux alpha/beta/main) est décrit dans
 
 ### Changed
 
+- Garde-fou contre les handlers inline, en prévision de la Content-Security-Policy stricte de Kintai Core 0.3.0 (`script-src 'self' 'nonce-…'`, sans `'unsafe-inline'`) : `tests.yml` échoue désormais si un attribut `onclick=`/`onchange=`/`onsubmit=`/`oninput=`, un lien `javascript:` ou un `<script>` sans nonce apparaît dans `Views/` ou `src/` — le navigateur les bloquerait en silence, sans aucune erreur côté serveur. **Aucun changement fonctionnel** : les vues de ce bundle n'utilisent déjà aucun handler inline ni `<script>` inline exécutable. La règle est documentée dans `CONTRIBUTING.md` et `CLAUDE.md`.
+
+### Changed
+
 - Le CSS du widget (`.notebook-widget-list`/`.notebook-widget-item*`) vivait physiquement dans Kintai Core (`public/assets/css/src/components/notebook.css`), pas dans ce dépôt — le bundle en dépendait silencieusement sans jamais le fournir lui-même, cassant l'isolation que la distribution en dépôt séparé est censée garantir. Il vit maintenant dans `public/css/notebook.css`, servi via le nouveau mécanisme `Bundle::loadAssetsFrom()`/`bundle_asset()` de Kintai Core, chargé par `Views/notebook.php` **et** par le widget dashboard natif du Core (qui s'aligne désormais sur ce fichier au lieu d'en garder sa propre copie). **Nécessite** `kintai_core.min: "0.2.0"` (voir `docs/creating-a-bundle.md`'s "Assets" côté Core).
 
 ## [1.1.0] - 2026-09-29
