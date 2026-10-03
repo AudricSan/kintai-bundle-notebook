@@ -3,6 +3,7 @@
     "bundle_notebook_desc": "Team notebook — messages shown on the admin and employee dashboards, pinning, automatic expiration.",
     "error_notebook_entry_not_found": "Note not found.",
     "error_notebook_forbidden": "You're not allowed to perform this action on this note.",
+    "error_notebook_content_required": "The note content is required.",
     "notebook_content": "Message",
     "notebook_created": "Note published.",
     "notebook_delete_confirm": "Permanently delete this note?",

@@ -51,6 +51,18 @@ final class NotebookControllerTest extends TestCase
         $this->roles->method('getGlobalPermissionKeys')->with(5)->willReturn([]);
     }
 
+    /** Rôle système en portée globale (Owner) : aucune restriction de magasin. */
+    private function grantGlobal(int $userId): void
+    {
+        $this->assignments->method('findByUser')->willReturnCallback(
+            fn(int $uid) => $uid === $userId
+                ? [['id' => 1, 'user_id' => $uid, 'role_id' => 1, 'scope_type' => 'global', 'scope_id' => null]]
+                : []
+        );
+        $this->roles->method('findById')->with(1)->willReturn(['id' => 1, 'is_system' => 1]);
+        $this->roles->method('getGlobalPermissionKeys')->with(1)->willReturn([]);
+    }
+
     private function requestFor(int $userId): Request
     {
         $req = new Request();
@@ -120,6 +132,7 @@ final class NotebookControllerTest extends TestCase
 
     public function testStoreSetsTheAuthenticatedUserAsAuthorRegardlessOfPayload(): void
     {
+        $this->grantGlobal(9); // note « organisation » : portée globale requise
         $this->notes->method('save')->willReturnCallback(fn(array $data) => $data + ['id' => 1]);
         $this->notes->expects($this->once())->method('save')->with($this->callback(
             fn(array $data) => $data['author_id'] === 9 && $data['pinned'] === 0
@@ -171,5 +184,54 @@ final class NotebookControllerTest extends TestCase
         $response = $this->controller->destroy($req);
 
         $this->assertSame(204, $response->status());
+    }
+
+    // --- Audit du 03/10/2026 : liste blanche à la création et à la modification ---
+
+    public function testStoreIgnoresIdSoItCannotOverwriteSomeoneElsesNote(): void
+    {
+        $this->grantStoreScoped(9, 1, ['notebook.create']);
+        $this->notes->expects($this->once())->method('save')->with($this->callback(
+            fn(array $data) => !array_key_exists('id', $data)
+                && $data['author_id'] === 9
+                && $data['pinned'] === 0
+                && $data['store_id'] === 1
+        ))->willReturn(['id' => 50]);
+
+        $req = $this->withJsonBody($this->requestFor(9), ['id' => 5, 'content' => 'x', 'store_id' => 1, 'pinned' => 1, 'author_id' => 1]);
+
+        $this->assertSame(201, $this->controller->store($req)->status());
+    }
+
+    public function testStoreForbidsAnOrganisationWideNoteWithoutGlobalScope(): void
+    {
+        $this->grantStoreScoped(9, 1, ['notebook.create']);
+        $this->notes->expects($this->never())->method('save');
+
+        $this->expectException(ForbiddenException::class);
+        $this->controller->store($this->withJsonBody($this->requestFor(9), ['content' => 'pour tous']));
+    }
+
+    public function testStoreForbidsANoteInAStoreTheCallerDoesNotManage(): void
+    {
+        $this->grantStoreScoped(9, 1, ['notebook.create']);
+        $this->notes->expects($this->never())->method('save');
+
+        $this->expectException(ForbiddenException::class);
+        $this->controller->store($this->withJsonBody($this->requestFor(9), ['content' => 'x', 'store_id' => 2]));
+    }
+
+    public function testUpdateCannotMoveTheNoteNorPinItNorChangeItsCreationDate(): void
+    {
+        $this->grantStoreScoped(9, 1, []); // auteur, sans notebook.manage
+        $this->notes->method('findById')->willReturn(['id' => 5, 'author_id' => 9, 'store_id' => 1]);
+        $this->notes->expects($this->once())->method('save')->with($this->callback(
+            fn(array $data) => $data === ['id' => 5, 'content' => 'updated']
+        ));
+
+        $req = $this->withJsonBody($this->requestFor(9), ['content' => 'updated', 'store_id' => null, 'pinned' => 1, 'created_at' => '2000-01-01', 'id' => 99]);
+        $req->setRouteParams(['id' => '5']);
+
+        $this->controller->update($req);
     }
 }

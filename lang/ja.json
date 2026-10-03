@@ -3,6 +3,7 @@
     "bundle_notebook_desc": "チームノート — 管理者・従業員ダッシュボードに表示されるメッセージ、ピン留め、自動有効期限。",
     "error_notebook_entry_not_found": "ノートが見つかりません。",
     "error_notebook_forbidden": "このノートに対してこの操作を行う権限がありません。",
+    "error_notebook_content_required": "ノートの内容は必須です。",
     "notebook_content": "メッセージ",
     "notebook_created": "ノートを公開しました。",
     "notebook_delete_confirm": "このノートを完全に削除しますか？",
