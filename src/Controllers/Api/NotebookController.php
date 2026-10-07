@@ -43,12 +43,34 @@ final class NotebookController
     public function store(Request $request): Response
     {
         $authUser = $this->authUser($request);
-        $data = array_merge($request->json() ?? [], [
+        $body     = $request->json() ?? [];
+
+        // Liste blanche : ni id (upsert d'une note existante), ni author_id, ni pinned, ni created_at venus du client.
+        $content = trim((string) ($body['content'] ?? ''));
+        if ($content === '') {
+            throw new \kintai\Core\Exceptions\ValidationException(['content' => __('error_notebook_content_required')]);
+        }
+        $storeId = isset($body['store_id']) && $body['store_id'] !== '' ? (int) $body['store_id'] : null;
+
+        // Comme sur le web : une note « organisation » exige une portée globale, une note de magasin le droit sur ce magasin.
+        if ($storeId === null) {
+            $userId = (int) ($authUser['id'] ?? 0);
+            if ($this->permissions->scopedStoreIds($userId, 'notebook.create') !== []
+                || !$this->permissions->can($authUser, 'notebook.create', null)) {
+                throw new \kintai\Core\Exceptions\ForbiddenException(__('error_notebook_forbidden'));
+            }
+        } elseif (!$this->permissions->can($authUser, 'notebook.create', $storeId)) {
+            throw new \kintai\Core\Exceptions\ForbiddenException(__('error_notebook_forbidden'));
+        }
+
+        return Response::json($this->notes->save([
             'author_id'  => (int) ($authUser['id'] ?? 0),
+            'store_id'   => $storeId,
+            'content'    => $content,
             'pinned'     => 0,
+            'expires_at' => $body['expires_at'] ?? null,
             'created_at' => date('Y-m-d H:i:s'),
-        ]);
-        return Response::json($this->notes->save($data), 201);
+        ]), 201);
     }
 
     /** PUT /api/v1/notebook-entries/{id} */
@@ -56,8 +78,20 @@ final class NotebookController
     {
         $item = $this->requireEntry($request, 'notebook.create');
         $id   = (int) $item['id'];
-        $data = array_merge($request->json() ?? [], ['id' => $id]);
-        unset($data['author_id']);
+        $body = $request->json() ?? [];
+
+        // Seuls le texte et l'expiration sont modifiables : store_id, pinned (réservé à notebook.manage), created_at et author_id restent ceux de la note.
+        $data = ['id' => $id];
+        if (array_key_exists('content', $body)) {
+            $content = trim((string) $body['content']);
+            if ($content === '') {
+                throw new \kintai\Core\Exceptions\ValidationException(['content' => __('error_notebook_content_required')]);
+            }
+            $data['content'] = $content;
+        }
+        if (array_key_exists('expires_at', $body)) {
+            $data['expires_at'] = $body['expires_at'];
+        }
         return Response::json($this->notes->save($data));
     }
 
@@ -88,7 +122,7 @@ final class NotebookController
         $isAuthor = (int) $item['author_id'] === (int) ($authUser['id'] ?? 0);
         $storeId  = $item['store_id'] !== null ? (int) $item['store_id'] : null;
         if (!$isAuthor && !$this->permissions->can($authUser, $permissionKey, $storeId)) {
-            throw new \kintai\Core\Exceptions\ForbiddenException('Accès refusé.');
+            throw new \kintai\Core\Exceptions\ForbiddenException(__('error_notebook_forbidden'));
         }
 
         return $item;

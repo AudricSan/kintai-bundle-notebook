@@ -8,6 +8,10 @@ Le schéma de version (X.Y.Z, canaux alpha/beta/main) est décrit dans
 
 ## [Unreleased]
 
+### Fixed
+
+- Sécurité — `POST /api/v1/notebook-entries` ne contrôlait pas `store_id` : n'importe quel porteur de `notebook.create` pouvait créer une note visible de toute l'organisation (réservée à la portée globale sur le web) ou dans un magasin qu'il ne gère pas, et un `id` dans le corps écrasait la note de quelqu'un d'autre (upsert). Seuls `content`, `store_id` et `expires_at` sont lus ; une note d'organisation exige la portée globale, une note de magasin le droit sur ce magasin. `PUT` ne modifie plus que `content` et `expires_at` : `store_id`, `pinned` (réservé à `notebook.manage`), `created_at` et `author_id` ne changent pas.
+
 ### Changed
 
 - Garde-fou contre les handlers inline, en prévision de la Content-Security-Policy stricte de Kintai Core 0.3.0 (`script-src 'self' 'nonce-…'`, sans `'unsafe-inline'`) : `tests.yml` échoue désormais si un attribut `onclick=`/`onchange=`/`onsubmit=`/`oninput=`, un lien `javascript:` ou un `<script>` sans nonce apparaît dans `Views/` ou `src/` — le navigateur les bloquerait en silence, sans aucune erreur côté serveur. **Aucun changement fonctionnel** : les vues de ce bundle n'utilisent déjà aucun handler inline ni `<script>` inline exécutable. La règle est documentée dans `CONTRIBUTING.md` et `CLAUDE.md`.
