@@ -66,7 +66,7 @@ final class NotebookController
         $entries = array_map(function (array $n) use ($usersMap, $storesMap, $userId, $user): array {
             $n['author_name'] = $usersMap[(int) $n['author_id']] ?? ('#' . $n['author_id']);
             $n['store_name']  = $n['store_id'] !== null ? ($storesMap[(int) $n['store_id']] ?? null) : null;
-            $n['can_manage']  = $this->permissions->can($user, 'notebook.manage', $n['store_id'] !== null ? (int) $n['store_id'] : null);
+            $n['can_manage']  = $this->canManageEntry($user, $n['store_id'] !== null ? (int) $n['store_id'] : null);
             $n['can_edit']    = (int) $n['author_id'] === $userId || $n['can_manage'];
             return $n;
         }, $entries);
@@ -188,6 +188,11 @@ final class NotebookController
     public function togglePin(Request $request): Response
     {
         $entry = $this->requireEntry($request);
+        // La route n'exige notebook.manage que « quelque part » : sans ce contrôle, le gérant d'un seul
+        // magasin épinglait aussi les notes d'un autre magasin ou celles de toute l'organisation.
+        if (!$this->canManageEntry($request->getAttribute('auth_user') ?? [], $entry['store_id'] !== null ? (int) $entry['store_id'] : null)) {
+            throw new \kintai\Core\Exceptions\ForbiddenException(__('error_notebook_forbidden'));
+        }
         $entry['pinned'] = empty($entry['pinned']) ? 1 : 0;
         $this->notes->save($entry);
 
@@ -215,10 +220,22 @@ final class NotebookController
         if ((int) $entry['author_id'] === $userId) {
             return;
         }
-        if ($this->permissions->can($user, 'notebook.manage', $storeId)) {
+        if ($this->canManageEntry($user, $storeId)) {
             return;
         }
         throw new \kintai\Core\Exceptions\ForbiddenException(__('error_notebook_forbidden'));
+    }
+
+    /**
+     * notebook.manage sur le magasin de la note ; pour une note « toute l'organisation » (magasin nul),
+     * la permission doit être accordée sans restriction de magasin — `can(..., null)` signifie
+     * seulement « quelque part » et laissait un gérant d'un seul magasin modifier les notes globales.
+     */
+    private function canManageEntry(array $user, ?int $storeId): bool
+    {
+        return $storeId === null
+            ? $this->permissions->hasUnrestrictedGrant($user, 'notebook.manage')
+            : $this->permissions->can($user, 'notebook.manage', $storeId);
     }
 
     /** Notifie les utilisateurs ayant notebook.view — membres du store si scopée, tout le monde si organisation. */

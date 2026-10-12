@@ -282,6 +282,61 @@ final class NotebookControllerTest extends TestCase
         $this->assertStringContainsString('success=deleted', $this->redirectLocation($response));
     }
 
+    // ── notes « toute l'organisation » : portée illimitée exigée ─────────
+
+    /** Audit du 13/10/2026 : notebook.manage dans UN magasin ne suffit pas pour une note globale. */
+    public function testUpdateForbidsSingleStoreManagerOnAnOrgWideNote(): void
+    {
+        $this->grantStoreScopedRole(2, 1, ['notebook.manage']);
+        $this->notes->method('findById')->willReturn(['id' => 5, 'author_id' => 9, 'store_id' => null, 'content' => 'old', 'expires_at' => null]);
+        $_POST = ['content' => 'attempted edit'];
+        $this->notes->expects($this->never())->method('save');
+
+        $req = $this->request(2, [1]);
+        $req->setRouteParams(['id' => '5']);
+
+        $this->expectException(ForbiddenException::class);
+        $this->controller->update($req);
+    }
+
+    public function testDestroyForbidsSingleStoreManagerOnAnOrgWideNote(): void
+    {
+        $this->grantStoreScopedRole(2, 1, ['notebook.manage']);
+        $this->notes->method('findById')->willReturn(['id' => 5, 'author_id' => 9, 'store_id' => null]);
+        $this->notes->expects($this->never())->method('delete');
+
+        $req = $this->request(2, [1]);
+        $req->setRouteParams(['id' => '5']);
+
+        $this->expectException(ForbiddenException::class);
+        $this->controller->destroy($req);
+    }
+
+    public function testTogglePinForbidsSingleStoreManagerOnAnOrgWideNote(): void
+    {
+        $this->grantStoreScopedRole(2, 1, ['notebook.manage']);
+        $this->notes->method('findById')->willReturn(['id' => 5, 'author_id' => 9, 'store_id' => null, 'pinned' => 0]);
+        $this->notes->expects($this->never())->method('save');
+
+        $req = $this->request(2, [1]);
+        $req->setRouteParams(['id' => '5']);
+
+        $this->expectException(ForbiddenException::class);
+        $this->controller->togglePin($req);
+    }
+
+    public function testTogglePinAllowsAStoreManagerOnTheirOwnStoreNote(): void
+    {
+        $this->grantStoreScopedRole(2, 1, ['notebook.manage']);
+        $this->notes->method('findById')->willReturn(['id' => 5, 'author_id' => 9, 'store_id' => 1, 'pinned' => 0]);
+        $this->notes->expects($this->once())->method('save');
+
+        $req = $this->request(2, [1]);
+        $req->setRouteParams(['id' => '5']);
+
+        $this->assertStringContainsString('success=updated', $this->redirectLocation($this->controller->togglePin($req)));
+    }
+
     // ── togglePin() ──────────────────────────────────────────────────────
 
     public function testTogglePinFlipsPinnedState(): void
