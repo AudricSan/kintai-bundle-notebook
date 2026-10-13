@@ -9,6 +9,7 @@
     "notebook_delete_confirm": "Supprimer cette note définitivement ?",
     "notebook_deleted": "Note supprimée.",
     "notebook_error_empty_content": "Le message ne peut pas être vide.",
+    "notebook_expires_on": "Expire le",
     "notebook_hide_expired": "Masquer les expirées",
     "notebook_new_entry": "Nouvelle note",
     "notebook_pin": "Épingler",
