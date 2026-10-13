@@ -14,6 +14,7 @@
     "notebook_delete_confirm": "Permanently delete this note?",
     "notebook_deleted": "Note deleted.",
     "notebook_error_empty_content": "The message can't be empty.",
+    "notebook_expires_on": "Expires on",
     "notebook_hide_expired": "Hide expired",
     "notebook_new_entry": "New note",
     "notebook_org_wide": "Whole organization",
