@@ -9,6 +9,7 @@
     "notebook_delete_confirm": "このノートを完全に削除しますか？",
     "notebook_deleted": "ノートを削除しました。",
     "notebook_error_empty_content": "メッセージを空にすることはできません。",
+    "notebook_expires_on": "有効期限",
     "notebook_hide_expired": "期限切れを非表示",
     "notebook_new_entry": "新しいノート",
     "notebook_pin": "ピン留め",
