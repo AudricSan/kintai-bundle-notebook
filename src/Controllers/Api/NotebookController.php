@@ -6,7 +6,7 @@ namespace kintai\Bundles\Installed\Notebook\Controllers\Api;
 
 use kintai\Contract\Http\Paginator;
 use kintai\Contract\Auth\PermissionService;
-use kintai\Core\Repositories\NotebookEntryRepositoryInterface;
+use kintai\Bundles\Installed\Notebook\Repositories\NotebookEntryRepositoryInterface;
 use kintai\Contract\Http\Request;
 use kintai\Contract\Http\Response;
 

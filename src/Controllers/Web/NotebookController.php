@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace kintai\Bundles\Installed\Notebook\Controllers\Web;
 
 use kintai\Contract\Auth\PermissionService;
-use kintai\Core\Repositories\NotebookEntryRepositoryInterface;
+use kintai\Bundles\Installed\Notebook\Repositories\NotebookEntryRepositoryInterface;
 use kintai\Contract\Data\StoreRepositoryInterface;
 use kintai\Contract\Data\StoreUserRepositoryInterface;
 use kintai\Contract\Data\UserRepositoryInterface;

@@ -7,7 +7,7 @@ namespace kintai\Tests\Bundles\Notebook\Controllers\Web;
 use kintai\Bundles\Installed\Notebook\Controllers\Web\NotebookController;
 use kintai\Core\Auth\PermissionService;
 use kintai\Core\Exceptions\ForbiddenException;
-use kintai\Core\Repositories\NotebookEntryRepositoryInterface;
+use kintai\Bundles\Installed\Notebook\Repositories\NotebookEntryRepositoryInterface;
 use kintai\Core\Repositories\RoleAssignmentRepositoryInterface;
 use kintai\Core\Repositories\RoleRepositoryInterface;
 use kintai\Core\Repositories\StoreRepositoryInterface;
