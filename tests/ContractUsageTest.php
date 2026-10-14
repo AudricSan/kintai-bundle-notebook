@@ -15,8 +15,6 @@ use PHPUnit\Framework\TestCase;
 final class ContractUsageTest extends TestCase
 {
     private const PENDING_EXTRACTION = [
-        'kintai\\Core\\Repositories\\DatabaseNotebookEntryRepository',
-        'kintai\\Core\\Repositories\\NotebookEntryRepositoryInterface',
     ];
 
     public function testOnlyTheBundleContractIsUsed(): void

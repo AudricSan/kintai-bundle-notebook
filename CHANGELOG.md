@@ -14,6 +14,7 @@ Le schéma de version (X.Y.Z, canaux alpha/beta/main) est décrit dans
 
 ### Changed
 
+- Extraction du Core (étape 4 du plan du contrat) : le bundle possède désormais tout son code et ses données. Le modèle `NotebookEntry`, le dépôt `NotebookEntryRepositoryInterface` / `DatabaseNotebookEntryRepository` (`src/Models`, `src/Repositories`) quittent le Core ; la table `notebook_entries` garde son nom et ses données. Le widget « Notes d'équipe » des tableaux de bord gérant et employé est fourni par le bundle (`dashboardWidgets()`, même clé `team_notes` pour conserver les préférences, vues `Views/widgets/`, données par `Services/TeamNotesWidget`), ainsi que le type de notification `notebook_entry_created` (`notificationTypes()`) et les libellés (widget, fonctionnalité « notes », catégorie de permissions) dans `lang/`. Même rendu qu'avant. `ContractUsageTest` n'admet plus aucune classe du Core hors contrat, et `ContractDeclarationsTest` vérifie chaque déclaration valeur par valeur.
 - Contrat de bundle versionné : le bundle n'utilise plus que les noms du contrat `kintai\Contract\…` du Core (requête, réponse, routes, middlewares, exceptions, droits, données du Core, services, vues et composants) et déclare `"kintai_contract": "^1.0"` dans `bundle.json` (`kintai_core.min` relevé à `0.3.6`, première version du Core qui fournit le contrat). Nouveau test `ContractUsageTest` : toute utilisation du Core hors contrat échoue, hormis 2 classe(s) propre(s) au bundle qui vivent encore dans le Core (extraction prévue).
 
 ### Fixed
