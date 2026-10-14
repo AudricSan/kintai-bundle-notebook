@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace kintai\Bundles\Installed\Notebook;
 
-use kintai\Core\BundleContract\Bundle;
+use kintai\Contract\Bundle;
 use kintai\Core\Repositories\NotebookEntryRepositoryInterface;
 use kintai\Core\Repositories\DatabaseNotebookEntryRepository;
 
@@ -17,7 +17,7 @@ final class NotebookBundle extends Bundle
 
     public function getVersion(): string
     {
-        return '1.1.0';
+        return '1.2.0';
     }
 
     public function getLabel(): string

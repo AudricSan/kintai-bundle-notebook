@@ -10,6 +10,7 @@
     "autoload-dev": {
         "psr-4": {
             "kintai\\": "../../Kintai/src/",
+            "kintai\\Tests\\Support\\": "../../Kintai/tests/Support/",
             "kintai\\Bundles\\Installed\\Notebook\\": "src/",
             "kintai\\Tests\\Bundles\\Notebook\\": "tests/"
         },

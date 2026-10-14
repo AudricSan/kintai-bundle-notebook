@@ -1,9 +1,9 @@
 <?php
 
-use kintai\UI\Components\Badge;
-use kintai\UI\Components\Button;
-use kintai\UI\Components\Card;
-use kintai\UI\Components\Flash;
+use kintai\Contract\View\Components\Badge;
+use kintai\Contract\View\Components\Button;
+use kintai\Contract\View\Components\Card;
+use kintai\Contract\View\Components\Flash;
 
 /** @var array $entries */
 /** @var array $stores_map        id → nom */

@@ -4,17 +4,17 @@ declare(strict_types=1);
 
 namespace kintai\Bundles\Installed\Notebook\Controllers\Web;
 
-use kintai\Core\Auth\PermissionService;
+use kintai\Contract\Auth\PermissionService;
 use kintai\Core\Repositories\NotebookEntryRepositoryInterface;
-use kintai\Core\Repositories\StoreRepositoryInterface;
-use kintai\Core\Repositories\StoreUserRepositoryInterface;
-use kintai\Core\Repositories\UserRepositoryInterface;
-use kintai\Core\Request;
-use kintai\Core\Response;
-use kintai\Core\Services\AuditLogger;
-use kintai\Core\Services\NotificationService;
-use kintai\UI\Controller\Web\HasAdminAccess;
-use kintai\UI\ViewRenderer;
+use kintai\Contract\Data\StoreRepositoryInterface;
+use kintai\Contract\Data\StoreUserRepositoryInterface;
+use kintai\Contract\Data\UserRepositoryInterface;
+use kintai\Contract\Http\Request;
+use kintai\Contract\Http\Response;
+use kintai\Contract\Services\AuditLogger;
+use kintai\Contract\Services\NotificationService;
+use kintai\Contract\Http\Concerns\HasAdminAccess;
+use kintai\Contract\View\ViewRenderer;
 
 final class NotebookController
 {
@@ -191,7 +191,7 @@ final class NotebookController
         // La route n'exige notebook.manage que « quelque part » : sans ce contrôle, le gérant d'un seul
         // magasin épinglait aussi les notes d'un autre magasin ou celles de toute l'organisation.
         if (!$this->canManageEntry($request->getAttribute('auth_user') ?? [], $entry['store_id'] !== null ? (int) $entry['store_id'] : null)) {
-            throw new \kintai\Core\Exceptions\ForbiddenException(__('error_notebook_forbidden'));
+            throw new \kintai\Contract\Exceptions\ForbiddenException(__('error_notebook_forbidden'));
         }
         $entry['pinned'] = empty($entry['pinned']) ? 1 : 0;
         $this->notes->save($entry);
@@ -203,7 +203,7 @@ final class NotebookController
     {
         $entry = $this->notes->findById((int) $request->param('id'));
         if ($entry === null) {
-            throw new \kintai\Core\Exceptions\NotFoundException(__('error_notebook_entry_not_found'));
+            throw new \kintai\Contract\Exceptions\NotFoundException(__('error_notebook_entry_not_found'));
         }
         if ($entry['store_id'] !== null) {
             $this->assertStoreAccess($request, (int) $entry['store_id']);
@@ -223,7 +223,7 @@ final class NotebookController
         if ($this->canManageEntry($user, $storeId)) {
             return;
         }
-        throw new \kintai\Core\Exceptions\ForbiddenException(__('error_notebook_forbidden'));
+        throw new \kintai\Contract\Exceptions\ForbiddenException(__('error_notebook_forbidden'));
     }
 
     /**
