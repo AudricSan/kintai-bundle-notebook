@@ -5,8 +5,9 @@ declare(strict_types=1);
 namespace kintai\Bundles\Installed\Notebook;
 
 use kintai\Contract\Bundle;
-use kintai\Core\Repositories\NotebookEntryRepositoryInterface;
+use kintai\Contract\Extension\StoreFeature;
 use kintai\Core\Repositories\DatabaseNotebookEntryRepository;
+use kintai\Core\Repositories\NotebookEntryRepositoryInterface;
 
 final class NotebookBundle extends Bundle
 {
@@ -46,5 +47,21 @@ final class NotebookBundle extends Bundle
             NotebookEntryRepositoryInterface::class,
             fn() => new DatabaseNotebookEntryRepository()
         );
+    }
+
+    /**
+     * Catégories de permissions (contrat 1.2), proposées sur la page des rôles.
+     */
+    public function permissions(): array
+    {
+        return ['notebook' => ['view', 'create', 'manage']];
+    }
+
+    /**
+     * Fonctionnalité activable par magasin (contrat 1.3), sur la fiche magasin.
+     */
+    public function storeFeatures(): array
+    {
+        return [new StoreFeature('notes', 'feature_notes', 'feature_notes_desc', '📝', 90)];
     }
 }
