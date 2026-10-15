@@ -8,6 +8,15 @@ Le schéma de version (X.Y.Z, canaux alpha/beta/main) est décrit dans
 
 ## [Unreleased]
 
+### Added
+
+- Contrat de bundle 1.11 : le bundle déclare lui-même ce qu'il apporte au Core (`permissions()`, `storeFeatures()`) au lieu que le Core le connaisse à l'avance ; déclarations identiques à ce que le Core affichait pour ce bundle, rien ne change à l'écran. `bundle.json` demande désormais `"kintai_contract": "^1.11"` (Kintai Core avec les points d'extension et fournisseurs du contrat). Nouveau test `ContractDeclarationsTest` : chaque déclaration est comparée au repli historique du Core.
+
+### Changed
+
+- Extraction du Core (étape 4 du plan du contrat) : le bundle possède désormais tout son code et ses données. Le modèle `NotebookEntry`, le dépôt `NotebookEntryRepositoryInterface` / `DatabaseNotebookEntryRepository` (`src/Models`, `src/Repositories`) quittent le Core ; la table `notebook_entries` garde son nom et ses données. Le widget « Notes d'équipe » des tableaux de bord gérant et employé est fourni par le bundle (`dashboardWidgets()`, même clé `team_notes` pour conserver les préférences, vues `Views/widgets/`, données par `Services/TeamNotesWidget`), ainsi que le type de notification `notebook_entry_created` (`notificationTypes()`) et les libellés (widget, fonctionnalité « notes », catégorie de permissions) dans `lang/`. Même rendu qu'avant. `ContractUsageTest` n'admet plus aucune classe du Core hors contrat, et `ContractDeclarationsTest` vérifie chaque déclaration valeur par valeur.
+- Contrat de bundle versionné : le bundle n'utilise plus que les noms du contrat `kintai\Contract\…` du Core (requête, réponse, routes, middlewares, exceptions, droits, données du Core, services, vues et composants) et déclare `"kintai_contract": "^1.0"` dans `bundle.json` (`kintai_core.min` relevé à `0.3.6`, première version du Core qui fournit le contrat). Nouveau test `ContractUsageTest` : toute utilisation du Core hors contrat échoue, hormis 2 classe(s) propre(s) au bundle qui vivent encore dans le Core (extraction prévue).
+
 ### Fixed
 
 - i18n — la clé `notebook_expires_on` (étiquette du champ d'expiration et badge « expire le … ») n'existait dans aucune langue : le bloc-notes affichait la clé brute. Ajoutée en fr, en et ja.

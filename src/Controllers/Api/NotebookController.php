@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace kintai\Bundles\Installed\Notebook\Controllers\Api;
 
-use kintai\Core\Api\Paginator;
-use kintai\Core\Auth\PermissionService;
-use kintai\Core\Repositories\NotebookEntryRepositoryInterface;
-use kintai\Core\Request;
-use kintai\Core\Response;
+use kintai\Contract\Http\Paginator;
+use kintai\Contract\Auth\PermissionService;
+use kintai\Bundles\Installed\Notebook\Repositories\NotebookEntryRepositoryInterface;
+use kintai\Contract\Http\Request;
+use kintai\Contract\Http\Response;
 
 final class NotebookController
 {
@@ -48,7 +48,7 @@ final class NotebookController
         // Liste blanche : ni id (upsert d'une note existante), ni author_id, ni pinned, ni created_at venus du client.
         $content = trim((string) ($body['content'] ?? ''));
         if ($content === '') {
-            throw new \kintai\Core\Exceptions\ValidationException(['content' => __('error_notebook_content_required')]);
+            throw new \kintai\Contract\Exceptions\ValidationException(['content' => __('error_notebook_content_required')]);
         }
         $storeId = isset($body['store_id']) && $body['store_id'] !== '' ? (int) $body['store_id'] : null;
 
@@ -57,10 +57,10 @@ final class NotebookController
             $userId = (int) ($authUser['id'] ?? 0);
             if ($this->permissions->scopedStoreIds($userId, 'notebook.create') !== []
                 || !$this->permissions->can($authUser, 'notebook.create', null)) {
-                throw new \kintai\Core\Exceptions\ForbiddenException(__('error_notebook_forbidden'));
+                throw new \kintai\Contract\Exceptions\ForbiddenException(__('error_notebook_forbidden'));
             }
         } elseif (!$this->permissions->can($authUser, 'notebook.create', $storeId)) {
-            throw new \kintai\Core\Exceptions\ForbiddenException(__('error_notebook_forbidden'));
+            throw new \kintai\Contract\Exceptions\ForbiddenException(__('error_notebook_forbidden'));
         }
 
         return Response::json($this->notes->save([
@@ -85,7 +85,7 @@ final class NotebookController
         if (array_key_exists('content', $body)) {
             $content = trim((string) $body['content']);
             if ($content === '') {
-                throw new \kintai\Core\Exceptions\ValidationException(['content' => __('error_notebook_content_required')]);
+                throw new \kintai\Contract\Exceptions\ValidationException(['content' => __('error_notebook_content_required')]);
             }
             $data['content'] = $content;
         }
@@ -116,13 +116,13 @@ final class NotebookController
         $item     = $this->notes->findById($id);
 
         if ($item === null) {
-            throw new \kintai\Core\Exceptions\NotFoundException('Note introuvable.');
+            throw new \kintai\Contract\Exceptions\NotFoundException('Note introuvable.');
         }
 
         $isAuthor = (int) $item['author_id'] === (int) ($authUser['id'] ?? 0);
         $storeId  = $item['store_id'] !== null ? (int) $item['store_id'] : null;
         if (!$isAuthor && !$this->permissions->can($authUser, $permissionKey, $storeId)) {
-            throw new \kintai\Core\Exceptions\ForbiddenException(__('error_notebook_forbidden'));
+            throw new \kintai\Contract\Exceptions\ForbiddenException(__('error_notebook_forbidden'));
         }
 
         return $item;

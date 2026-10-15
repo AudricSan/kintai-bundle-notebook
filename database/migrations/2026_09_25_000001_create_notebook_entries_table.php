@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace kintai\Database\Migrations;
 
-use kintai\Core\Database\Migration;
+use kintai\Contract\Database\Migration;
 use Illuminate\Database\Schema\Blueprint;
 
 /**
