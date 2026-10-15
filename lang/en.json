@@ -6,7 +6,7 @@
     "error_notebook_forbidden": "You're not allowed to perform this action on this note.",
     "feature_notes": "Notebook",
     "feature_notes_desc": "Team messages shown on the dashboard.",
-    "my_team_notes": "Team notes",
+    "my_team_notes": "Notes from my stores",
     "no_notebook_entries": "No notes yet.",
     "notebook_anonymous_author": "Unknown author",
     "notebook_content": "Message",
@@ -27,5 +27,5 @@
     "notif_notebook_entry_created": "New note",
     "notif_notebook_entry_created_body": "New note from :author: \":excerpt\"",
     "perm_category_notebook": "Notebook",
-    "widget_team_notes": "Notebook"
+    "widget_team_notes": "Team notes"
 }

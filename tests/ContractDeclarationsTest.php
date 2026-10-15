@@ -94,4 +94,16 @@ final class ContractDeclarationsTest extends TestCase
             }
         }
     }
+
+    /**
+     * Un gérant peut afficher les deux widgets côte à côte (le sien et celui de son espace employé) : leurs titres
+     * doivent se distinguer, sinon rien n'indique que l'un porte sur les magasins gérés et l'autre sur ses magasins.
+     */
+    public function testManagerAndEmployeeWidgetTitlesDiffer(): void
+    {
+        foreach (['fr', 'en', 'ja'] as $locale) {
+            $lang = json_decode((string) file_get_contents(dirname(__DIR__) . "/lang/{$locale}.json"), true);
+            $this->assertNotSame($lang['widget_team_notes'], $lang['my_team_notes'], $locale);
+        }
+    }
 }
