@@ -6,7 +6,7 @@
     "error_notebook_forbidden": "Vous n'avez pas le droit d'effectuer cette action sur cette note.",
     "feature_notes": "Carnet de notes",
     "feature_notes_desc": "Messages d'équipe visibles sur le dashboard.",
-    "my_team_notes": "Notes d'équipe",
+    "my_team_notes": "Notes de mes magasins",
     "no_notebook_entries": "Aucune note pour le moment.",
     "notebook_anonymous_author": "Auteur inconnu",
     "notebook_content": "Message",
@@ -27,5 +27,5 @@
     "notif_notebook_entry_created": "Nouvelle note",
     "notif_notebook_entry_created_body": "Nouvelle note de :author : « :excerpt »",
     "perm_category_notebook": "Carnet de notes",
-    "widget_team_notes": "Carnet de notes"
+    "widget_team_notes": "Notes d'équipe"
 }

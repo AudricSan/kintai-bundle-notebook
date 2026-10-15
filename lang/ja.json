@@ -6,7 +6,7 @@
     "error_notebook_forbidden": "このノートに対してこの操作を行う権限がありません。",
     "feature_notes": "ノート",
     "feature_notes_desc": "ダッシュボードに表示されるチームメッセージ。",
-    "my_team_notes": "チームノート",
+    "my_team_notes": "所属店舗のノート",
     "no_notebook_entries": "まだノートがありません。",
     "notebook_anonymous_author": "不明な投稿者",
     "notebook_content": "メッセージ",
@@ -27,5 +27,5 @@
     "notif_notebook_entry_created": "新しいノート",
     "notif_notebook_entry_created_body": ":author さんが新しいノートを投稿しました：「:excerpt」",
     "perm_category_notebook": "ノート",
-    "widget_team_notes": "ノート"
+    "widget_team_notes": "チームノート"
 }
