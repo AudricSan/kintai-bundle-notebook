@@ -19,28 +19,29 @@ use kintai\Core\Services\AuditLogger;
 use kintai\Core\Services\NotificationService;
 use kintai\UI\ViewRenderer;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
 
 final class NotebookControllerTest extends TestCase
 {
-    private NotebookEntryRepositoryInterface&MockObject $notes;
-    private StoreRepositoryInterface&MockObject $stores;
-    private StoreUserRepositoryInterface&MockObject $storeUsers;
-    private UserRepositoryInterface&MockObject $users;
-    private NotificationService&MockObject $notifs;
-    private RoleAssignmentRepositoryInterface&MockObject $assignments;
-    private RoleRepositoryInterface&MockObject $roles;
-    private NotebookController $controller;
+    private NotebookEntryRepositoryInterface&Stub $notes;
+    private StoreRepositoryInterface&Stub $stores;
+    private StoreUserRepositoryInterface&Stub $storeUsers;
+    private UserRepositoryInterface&Stub $users;
+    private NotificationService&Stub $notifs;
+    private RoleAssignmentRepositoryInterface&Stub $assignments;
+    private RoleRepositoryInterface&Stub $roles;
+    private ?NotebookController $controller = null;
 
     protected function setUp(): void
     {
-        $this->notes       = $this->createMock(NotebookEntryRepositoryInterface::class);
-        $this->stores      = $this->createMock(StoreRepositoryInterface::class);
-        $this->storeUsers  = $this->createMock(StoreUserRepositoryInterface::class);
-        $this->users       = $this->createMock(UserRepositoryInterface::class);
-        $this->notifs      = $this->createMock(NotificationService::class);
-        $this->assignments = $this->createMock(RoleAssignmentRepositoryInterface::class);
-        $this->roles       = $this->createMock(RoleRepositoryInterface::class);
+        $this->notes       = $this->createStub(NotebookEntryRepositoryInterface::class);
+        $this->stores      = $this->createStub(StoreRepositoryInterface::class);
+        $this->storeUsers  = $this->createStub(StoreUserRepositoryInterface::class);
+        $this->users       = $this->createStub(UserRepositoryInterface::class);
+        $this->notifs      = $this->createStub(NotificationService::class);
+        $this->assignments = $this->createStub(RoleAssignmentRepositoryInterface::class);
+        $this->roles       = $this->createStub(RoleRepositoryInterface::class);
 
         $this->stores->method('findAll')->willReturn([['id' => 1, 'name' => 'Store 1'], ['id' => 2, 'name' => 'Store 2']]);
         // Pas de findAll() par défaut ici : plusieurs tests le reconfigurent avec une valeur
@@ -48,17 +49,25 @@ final class NotebookControllerTest extends TestCase
         // second stub inconditionnel sur le même mock est ambigu côté PHPUnit (le premier stub
         // sans contrainte peut rester actif) — vu ici en pratique : la valeur du setUp() gagnait
         // silencieusement sur celle du test, notifyMembers() itérait alors une liste vide.
+    }
 
-        $this->controller = new NotebookController(
-            new ViewRenderer(sys_get_temp_dir()),
-            $this->notes,
-            $this->stores,
-            $this->storeUsers,
-            $this->users,
-            new AuditLogger(),
-            $this->notifs,
-            new PermissionService($this->assignments, $this->roles),
-        );
+    /** Objet testé, construit à la première utilisation : un test peut d'abord remplacer un bouchon par un mock. */
+    private function controller(): NotebookController
+    {
+        if ($this->controller === null) {
+            $this->controller = new NotebookController(
+                new ViewRenderer(sys_get_temp_dir()),
+                $this->notes,
+                $this->stores,
+                $this->storeUsers,
+                $this->users,
+                new AuditLogger(),
+                $this->notifs,
+                new PermissionService($this->assignments, $this->roles),
+            );
+        }
+
+        return $this->controller;
     }
 
     /**
@@ -75,17 +84,17 @@ final class NotebookControllerTest extends TestCase
                 ? [['id' => 1, 'user_id' => $userId, 'role_id' => 9, 'scope_type' => 'global', 'scope_id' => null]]
                 : []
         );
-        $this->roles->method('findById')->with(9)->willReturn(['id' => 9, 'is_system' => 1]);
+        $this->roles->method('findById')->willReturnCallback(fn($a0) => $a0 === 9 ? ['id' => 9, 'is_system' => 1] : null);
     }
 
     private function grantStoreScopedRole(int $userId, int $storeId, array $permissions): void
     {
-        $this->assignments->method('findByUser')->with($userId)->willReturn([
+        $this->assignments->method('findByUser')->willReturnCallback(fn($a0) => $a0 === $userId ? [
             ['id' => 1, 'user_id' => $userId, 'role_id' => 5, 'scope_type' => 'store', 'scope_id' => $storeId],
-        ]);
-        $this->roles->method('findById')->with(5)->willReturn(['id' => 5, 'is_system' => 0]);
-        $this->roles->method('getPermissions')->with(5)->willReturn($permissions);
-        $this->roles->method('getGlobalPermissionKeys')->with(5)->willReturn([]);
+        ] : []);
+        $this->roles->method('findById')->willReturnCallback(fn($a0) => $a0 === 5 ? ['id' => 5, 'is_system' => 0] : null);
+        $this->roles->method('getPermissions')->willReturnCallback(fn($a0) => $a0 === 5 ? $permissions : []);
+        $this->roles->method('getGlobalPermissionKeys')->willReturnCallback(fn($a0) => $a0 === 5 ? [] : []);
     }
 
     private function request(int $userId, ?array $managedStoreIds): Request
@@ -112,18 +121,23 @@ final class NotebookControllerTest extends TestCase
 
     public function testStoreRejectsEmptyContent(): void
     {
+        $this->notes = $this->createMock(NotebookEntryRepositoryInterface::class);
         $this->grantGlobalRole(1);
         $_POST = ['content' => '   '];
 
         $this->notes->expects($this->never())->method('save');
 
-        $response = $this->controller->store($this->request(1, null));
+        $response = $this->controller()->store($this->request(1, null));
 
         $this->assertStringContainsString('error=empty_content', $this->redirectLocation($response));
     }
 
     public function testStoreCreatesAStoreScopedNoteWhenUserManagesThatStore(): void
     {
+        $this->notes = $this->createMock(NotebookEntryRepositoryInterface::class);
+        $this->storeUsers = $this->createMock(StoreUserRepositoryInterface::class);
+        $this->users = $this->createMock(UserRepositoryInterface::class);
+        $this->notifs = $this->createMock(NotificationService::class);
         $this->grantStoreScopedRole(9, 1, ['notebook.create', 'notebook.view']);
         $_POST = ['content' => 'Bonjour équipe', 'store_id' => '1'];
 
@@ -132,8 +146,8 @@ final class NotebookControllerTest extends TestCase
             fn(array $data) => $data['author_id'] === 9 && $data['store_id'] === 1 && $data['content'] === 'Bonjour équipe'
         ));
 
-        $this->storeUsers->method('findByStore')->with(1)->willReturn([['user_id' => 9, 'store_id' => 1]]);
-        $this->users->method('findById')->with(9)->willReturn(['id' => 9]);
+        $this->storeUsers->expects($this->atLeastOnce())->method('findByStore')->with(1)->willReturn([['user_id' => 9, 'store_id' => 1]]);
+        $this->users->expects($this->atLeastOnce())->method('findById')->with(9)->willReturn(['id' => 9]);
         $this->users->method('findAll')->willReturn([['id' => 9, 'first_name' => 'Jean', 'last_name' => 'Dupont']]);
         $this->notifs->expects($this->once())->method('notifyMany')->with(
             [9],
@@ -144,43 +158,48 @@ final class NotebookControllerTest extends TestCase
             '/notebook'
         );
 
-        $response = $this->controller->store($this->request(9, [1]));
+        $response = $this->controller()->store($this->request(9, [1]));
 
         $this->assertStringContainsString('success=created', $this->redirectLocation($response));
     }
 
     public function testStoreRejectsAStoreScopedNoteOnAStoreTheUserDoesNotManage(): void
     {
+        $this->notes = $this->createMock(NotebookEntryRepositoryInterface::class);
         $this->grantStoreScopedRole(9, 1, ['notebook.create']);
         $_POST = ['content' => 'Bonjour', 'store_id' => '2'];
 
         $this->notes->expects($this->never())->method('save');
 
         $this->expectException(ForbiddenException::class);
-        $this->controller->store($this->request(9, [1]));
+        $this->controller()->store($this->request(9, [1]));
     }
 
     public function testStoreRejectsAnOrgWideNoteWhenUserIsNotGloballyScoped(): void
     {
+        $this->notes = $this->createMock(NotebookEntryRepositoryInterface::class);
         $this->grantStoreScopedRole(9, 1, ['notebook.create']);
         $_POST = ['content' => 'Pour tous', 'store_id' => ''];
 
         $this->notes->expects($this->never())->method('save');
 
-        $response = $this->controller->store($this->request(9, [1]));
+        $response = $this->controller()->store($this->request(9, [1]));
 
         $this->assertStringContainsString('error=forbidden', $this->redirectLocation($response));
     }
 
     public function testStoreAllowsAnOrgWideNoteForAGloballyScopedUser(): void
     {
+        $this->notes = $this->createMock(NotebookEntryRepositoryInterface::class);
+        $this->notifs = $this->createMock(NotificationService::class);
+        $this->roles = $this->createMock(RoleRepositoryInterface::class);
         // Deux utilisateurs globalement scopés (ex. deux Owners) : les deux doivent être
         // notifiés, pas seulement l'auteur — vérifie que notifyMembers() ne s'arrête pas
         // au premier destinataire trouvé.
         $this->assignments->method('findByUser')->willReturnCallback(
             fn(int $uid) => [['id' => 1, 'user_id' => $uid, 'role_id' => 9, 'scope_type' => 'global', 'scope_id' => null]]
         );
-        $this->roles->method('findById')->with(9)->willReturn(['id' => 9, 'is_system' => 1]);
+        $this->roles->expects($this->atLeastOnce())->method('findById')->with(9)->willReturn(['id' => 9, 'is_system' => 1]);
         $_POST = ['content' => 'Pour tous'];
 
         $this->notes->method('save')->willReturn(['id' => 7]);
@@ -198,7 +217,7 @@ final class NotebookControllerTest extends TestCase
             '/notebook'
         );
 
-        $response = $this->controller->store($this->request(1, null));
+        $response = $this->controller()->store($this->request(1, null));
 
         $this->assertStringContainsString('success=created', $this->redirectLocation($response));
     }
@@ -207,6 +226,7 @@ final class NotebookControllerTest extends TestCase
 
     public function testUpdateAllowsTheAuthorToEditTheirOwnNoteWithoutManagePermission(): void
     {
+        $this->notes = $this->createMock(NotebookEntryRepositoryInterface::class);
         $this->grantStoreScopedRole(9, 1, ['notebook.create']); // pas de notebook.manage
         $this->notes->method('findById')->willReturn(['id' => 5, 'author_id' => 9, 'store_id' => 1, 'content' => 'old', 'expires_at' => null]);
         $_POST = ['content' => 'new content'];
@@ -218,13 +238,14 @@ final class NotebookControllerTest extends TestCase
             fn(array $data) => $data['content'] === 'new content'
         ));
 
-        $response = $this->controller->update($req);
+        $response = $this->controller()->update($req);
 
         $this->assertStringContainsString('success=updated', $this->redirectLocation($response));
     }
 
     public function testUpdateAllowsAManagerToEditSomeoneElsesNote(): void
     {
+        $this->notes = $this->createMock(NotebookEntryRepositoryInterface::class);
         $this->grantStoreScopedRole(2, 1, ['notebook.manage']);
         $this->notes->method('findById')->willReturn(['id' => 5, 'author_id' => 9, 'store_id' => 1, 'content' => 'old', 'expires_at' => null]);
         $_POST = ['content' => 'edited by manager'];
@@ -234,13 +255,14 @@ final class NotebookControllerTest extends TestCase
 
         $this->notes->expects($this->once())->method('save');
 
-        $response = $this->controller->update($req);
+        $response = $this->controller()->update($req);
 
         $this->assertStringContainsString('success=updated', $this->redirectLocation($response));
     }
 
     public function testUpdateForbidsANonAuthorWithoutManagePermission(): void
     {
+        $this->notes = $this->createMock(NotebookEntryRepositoryInterface::class);
         $this->grantStoreScopedRole(2, 1, ['notebook.create']); // pas manage
         $this->notes->method('findById')->willReturn(['id' => 5, 'author_id' => 9, 'store_id' => 1, 'content' => 'old', 'expires_at' => null]);
         $_POST = ['content' => 'attempted edit'];
@@ -251,11 +273,12 @@ final class NotebookControllerTest extends TestCase
         $req->setRouteParams(['id' => '5']);
 
         $this->expectException(ForbiddenException::class);
-        $this->controller->update($req);
+        $this->controller()->update($req);
     }
 
     public function testDestroyForbidsANonAuthorWithoutManagePermission(): void
     {
+        $this->notes = $this->createMock(NotebookEntryRepositoryInterface::class);
         $this->grantStoreScopedRole(2, 1, ['notebook.create']);
         $this->notes->method('findById')->willReturn(['id' => 5, 'author_id' => 9, 'store_id' => 1]);
 
@@ -265,11 +288,12 @@ final class NotebookControllerTest extends TestCase
         $req->setRouteParams(['id' => '5']);
 
         $this->expectException(ForbiddenException::class);
-        $this->controller->destroy($req);
+        $this->controller()->destroy($req);
     }
 
     public function testDestroyAllowsTheAuthorToDeleteTheirOwnNote(): void
     {
+        $this->notes = $this->createMock(NotebookEntryRepositoryInterface::class);
         $this->grantStoreScopedRole(9, 1, []);
         $this->notes->method('findById')->willReturn(['id' => 5, 'author_id' => 9, 'store_id' => 1]);
         $this->notes->expects($this->once())->method('delete')->with(5);
@@ -277,7 +301,7 @@ final class NotebookControllerTest extends TestCase
         $req = $this->request(9, [1]);
         $req->setRouteParams(['id' => '5']);
 
-        $response = $this->controller->destroy($req);
+        $response = $this->controller()->destroy($req);
 
         $this->assertStringContainsString('success=deleted', $this->redirectLocation($response));
     }
@@ -287,6 +311,7 @@ final class NotebookControllerTest extends TestCase
     /** Audit du 13/10/2026 : notebook.manage dans UN magasin ne suffit pas pour une note globale. */
     public function testUpdateForbidsSingleStoreManagerOnAnOrgWideNote(): void
     {
+        $this->notes = $this->createMock(NotebookEntryRepositoryInterface::class);
         $this->grantStoreScopedRole(2, 1, ['notebook.manage']);
         $this->notes->method('findById')->willReturn(['id' => 5, 'author_id' => 9, 'store_id' => null, 'content' => 'old', 'expires_at' => null]);
         $_POST = ['content' => 'attempted edit'];
@@ -296,11 +321,12 @@ final class NotebookControllerTest extends TestCase
         $req->setRouteParams(['id' => '5']);
 
         $this->expectException(ForbiddenException::class);
-        $this->controller->update($req);
+        $this->controller()->update($req);
     }
 
     public function testDestroyForbidsSingleStoreManagerOnAnOrgWideNote(): void
     {
+        $this->notes = $this->createMock(NotebookEntryRepositoryInterface::class);
         $this->grantStoreScopedRole(2, 1, ['notebook.manage']);
         $this->notes->method('findById')->willReturn(['id' => 5, 'author_id' => 9, 'store_id' => null]);
         $this->notes->expects($this->never())->method('delete');
@@ -309,11 +335,12 @@ final class NotebookControllerTest extends TestCase
         $req->setRouteParams(['id' => '5']);
 
         $this->expectException(ForbiddenException::class);
-        $this->controller->destroy($req);
+        $this->controller()->destroy($req);
     }
 
     public function testTogglePinForbidsSingleStoreManagerOnAnOrgWideNote(): void
     {
+        $this->notes = $this->createMock(NotebookEntryRepositoryInterface::class);
         $this->grantStoreScopedRole(2, 1, ['notebook.manage']);
         $this->notes->method('findById')->willReturn(['id' => 5, 'author_id' => 9, 'store_id' => null, 'pinned' => 0]);
         $this->notes->expects($this->never())->method('save');
@@ -322,11 +349,12 @@ final class NotebookControllerTest extends TestCase
         $req->setRouteParams(['id' => '5']);
 
         $this->expectException(ForbiddenException::class);
-        $this->controller->togglePin($req);
+        $this->controller()->togglePin($req);
     }
 
     public function testTogglePinAllowsAStoreManagerOnTheirOwnStoreNote(): void
     {
+        $this->notes = $this->createMock(NotebookEntryRepositoryInterface::class);
         $this->grantStoreScopedRole(2, 1, ['notebook.manage']);
         $this->notes->method('findById')->willReturn(['id' => 5, 'author_id' => 9, 'store_id' => 1, 'pinned' => 0]);
         $this->notes->expects($this->once())->method('save');
@@ -334,13 +362,14 @@ final class NotebookControllerTest extends TestCase
         $req = $this->request(2, [1]);
         $req->setRouteParams(['id' => '5']);
 
-        $this->assertStringContainsString('success=updated', $this->redirectLocation($this->controller->togglePin($req)));
+        $this->assertStringContainsString('success=updated', $this->redirectLocation($this->controller()->togglePin($req)));
     }
 
     // ── togglePin() ──────────────────────────────────────────────────────
 
     public function testTogglePinFlipsPinnedState(): void
     {
+        $this->notes = $this->createMock(NotebookEntryRepositoryInterface::class);
         $this->grantGlobalRole(1);
         $this->notes->method('findById')->willReturn(['id' => 5, 'author_id' => 9, 'store_id' => null, 'pinned' => 0]);
         $this->notes->expects($this->once())->method('save')->with($this->callback(
@@ -350,7 +379,7 @@ final class NotebookControllerTest extends TestCase
         $req = $this->request(1, null);
         $req->setRouteParams(['id' => '5']);
 
-        $response = $this->controller->togglePin($req);
+        $response = $this->controller()->togglePin($req);
 
         $this->assertStringContainsString('success=updated', $this->redirectLocation($response));
     }
