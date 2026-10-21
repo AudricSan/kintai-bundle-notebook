@@ -87,10 +87,13 @@ final class NotebookBundle extends Bundle
     }
 
     /**
-     * Type de notification créé à la publication d'une note (contrat 1.7) ; libellé « notif_notebook_entry_created ».
+     * Type de notification créé à la publication d'une note ; libellé « notif_notebook_entry_created ». Format enrichi
+     * (contrat 1.23) : catégorie « messages », push par défaut, pas d'e-mail ; l'identifiant passé à notify() est celui de la note.
      */
     public function notificationTypes(): array
     {
-        return ['notebook_entry_created' => '📓'];
+        return [
+            'notebook_entry_created' => ['icon' => '📓', 'category' => 'messages', 'channels' => ['push' => true, 'email' => false], 'reference_type' => 'notebook_entry'],
+        ];
     }
 }

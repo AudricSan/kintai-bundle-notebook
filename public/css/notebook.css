@@ -30,6 +30,13 @@
     margin-top: 0;
 }
 
+/* Note désignée par une notification (?highlight=) : contour et halo la distinguent des autres. */
+.notebook-widget-item--highlight {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 1px;
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--color-primary) 25%, transparent);
+}
+
 .notebook-widget-item--pinned {
     border-color: var(--color-warning);
     background: color-mix(in srgb, var(--color-warning) 8%, var(--color-surface));

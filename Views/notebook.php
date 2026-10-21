@@ -6,6 +6,7 @@ use kintai\Contract\View\Components\Card;
 use kintai\Contract\View\Components\Flash;
 
 /** @var array $entries */
+/** @var int   $highlight_id note désignée par une notification (0 = aucune) */
 /** @var array $stores_map        id → nom */
 /** @var array $store_ids         stores accessibles à l'utilisateur */
 /** @var bool  $can_global        peut poster une note "toute l'organisation" */
@@ -86,7 +87,7 @@ echo Card::make()
 <?php else: ?>
     <ul class="notebook-widget-list">
         <?php foreach ($entries as $entry): ?>
-            <li class="notebook-widget-item<?= !empty($entry['pinned']) ? ' notebook-widget-item--pinned' : '' ?>">
+            <li class="notebook-widget-item<?= !empty($entry['pinned']) ? ' notebook-widget-item--pinned' : '' ?><?= (int) ($highlight_id ?? 0) > 0 && (int) $entry['id'] === (int) $highlight_id ? ' notebook-widget-item--highlight' : '' ?>">
                 <?php if (!empty($entry['pinned'])): ?>
                     <span class="notebook-widget-item__pin" title="<?= htmlspecialchars(__('notebook_pinned')) ?>">📌</span>
                 <?php endif; ?>
