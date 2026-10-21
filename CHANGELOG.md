@@ -8,6 +8,10 @@ Le schéma de version (X.Y.Z, canaux alpha/beta/main) est décrit dans
 
 ## [Unreleased]
 
+### Changed
+
+- Notifications (contrat 1.23, `kintai_contract` `^1.23`) : type `notebook_entry_created` déclaré au format enrichi (catégorie « messages », push par défaut, `reference_type` `notebook_entry`) ; le lien ouvre le carnet avec la note publiée en évidence (`?highlight=`) ; ouvrir le carnet marque comme lues les notifications des notes affichées.
+
 ### Added
 
 - Contrat de bundle 1.11 : le bundle déclare lui-même ce qu'il apporte au Core (`permissions()`, `storeFeatures()`) au lieu que le Core le connaisse à l'avance ; déclarations identiques à ce que le Core affichait pour ce bundle, rien ne change à l'écran. `bundle.json` demande désormais `"kintai_contract": "^1.11"` (Kintai Core avec les points d'extension et fournisseurs du contrat). Nouveau test `ContractDeclarationsTest` : chaque déclaration est comparée au repli historique du Core.

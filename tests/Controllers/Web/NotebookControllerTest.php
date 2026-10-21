@@ -119,6 +119,24 @@ final class NotebookControllerTest extends TestCase
 
     // ── store() ──────────────────────────────────────────────────────────
 
+    /** Ouvrir la liste marque comme lues les notifications des notes affichées. */
+    public function testIndexMarksTheNotificationsOfTheDisplayedNotesAsRead(): void
+    {
+        $this->notifs = $this->createMock(NotificationService::class);
+        $this->notes->method('findVisibleForStores')->willReturn([
+            ['id' => 3, 'author_id' => 1, 'store_id' => null, 'content' => 'a', 'pinned' => 0, 'created_at' => '2026-01-01 10:00:00', 'expires_at' => null],
+            ['id' => 8, 'author_id' => 1, 'store_id' => null, 'content' => 'b', 'pinned' => 1, 'created_at' => '2026-01-02 10:00:00', 'expires_at' => null],
+        ]);
+        $this->users->method('findAll')->willReturn([]);
+        $this->notifs->expects($this->once())->method('markReadFor')->with(9, 'notebook_entry', [8, 3]);
+
+        try {
+            $this->controller()->index($this->request(9, null));
+        } catch (\Throwable) {
+            // Le rendu de la vue n'est pas l'objet du test : « lu » est marqué avant.
+        }
+    }
+
     public function testStoreRejectsEmptyContent(): void
     {
         $this->notes = $this->createMock(NotebookEntryRepositoryInterface::class);
@@ -155,7 +173,7 @@ final class NotebookControllerTest extends TestCase
             'notif_notebook_entry_created_body',
             ['author' => 'Dupont Jean', 'excerpt' => 'Bonjour équipe'],
             42,
-            '/notebook'
+            '/notebook?highlight=42'
         );
 
         $response = $this->controller()->store($this->request(9, [1]));
@@ -214,7 +232,7 @@ final class NotebookControllerTest extends TestCase
             'notif_notebook_entry_created_body',
             ['author' => '#1', 'excerpt' => 'Pour tous'],
             7,
-            '/notebook'
+            '/notebook?highlight=7'
         );
 
         $response = $this->controller()->store($this->request(1, null));

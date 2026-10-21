@@ -71,8 +71,14 @@ final class NotebookController
             return $n;
         }, $entries);
 
+        // Les notes sont affichées : leurs notifications de publication sont lues.
+        if ($userId > 0 && $entries !== []) {
+            $this->notifs->markReadFor($userId, 'notebook_entry', array_map(fn(array $n) => (int) $n['id'], $entries));
+        }
+
         return Response::html($this->view->render('notebook::notebook', [
             'title'         => __('bundle_notebook'),
+            'highlight_id'  => (int) $request->query('highlight', 0),
             'entries'       => $entries,
             'stores_map'    => $storesMap,
             'store_ids'     => $storeIds,
@@ -266,7 +272,7 @@ final class NotebookController
                 'notif_notebook_entry_created_body',
                 ['author' => $authorName, 'excerpt' => $excerpt],
                 $referenceId,
-                '/notebook'
+                '/notebook?highlight=' . $referenceId
             );
         }
     }
