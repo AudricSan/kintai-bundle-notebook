@@ -6,5 +6,5 @@
  * @var list<array<string, mixed>> $notebook_entries Voir TeamNotesWidget::entries()
  */
 
-$notebookWidgetLabel = 'widget_team_notes';
+$notebookWidgetLabel = 'notebook_widget_team_notes';
 include __DIR__ . '/_card.php';

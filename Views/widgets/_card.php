@@ -16,7 +16,7 @@ use kintai\Contract\View\Components\Card;
 <?php
 ob_start();
 if (empty($notebook_entries)):
-    echo '<div class="empty-state">' . __('no_notebook_entries') . '</div>';
+    echo '<div class="empty-state">' . __('notebook_no_entries') . '</div>';
 else:
     echo '<ul class="notebook-widget-list">';
     foreach ($notebook_entries as $entry):

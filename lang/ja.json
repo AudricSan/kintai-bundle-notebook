@@ -1,13 +1,13 @@
 {
     "bundle_notebook": "ノート",
     "bundle_notebook_desc": "チームノート — 管理者・従業員ダッシュボードに表示されるメッセージ、ピン留め、自動有効期限。",
-    "error_notebook_content_required": "ノートの内容は必須です。",
-    "error_notebook_entry_not_found": "ノートが見つかりません。",
-    "error_notebook_forbidden": "このノートに対してこの操作を行う権限がありません。",
-    "feature_notes": "ノート",
-    "feature_notes_desc": "ダッシュボードに表示されるチームメッセージ。",
-    "my_team_notes": "所属店舗のノート",
-    "no_notebook_entries": "まだノートがありません。",
+    "notebook_error_content_required": "ノートの内容は必須です。",
+    "notebook_error_entry_not_found": "ノートが見つかりません。",
+    "notebook_error_forbidden": "このノートに対してこの操作を行う権限がありません。",
+    "notebook_feature_notes": "ノート",
+    "notebook_feature_notes_desc": "ダッシュボードに表示されるチームメッセージ。",
+    "notebook_my_team_notes": "所属店舗のノート",
+    "notebook_no_entries": "まだノートがありません。",
     "notebook_anonymous_author": "不明な投稿者",
     "notebook_content": "メッセージ",
     "notebook_created": "ノートを公開しました。",
@@ -27,5 +27,5 @@
     "notif_notebook_entry_created": "新しいノート",
     "notif_notebook_entry_created_body": ":author さんが新しいノートを投稿しました：「:excerpt」",
     "perm_category_notebook": "ノート",
-    "widget_team_notes": "チームノート"
+    "notebook_widget_team_notes": "チームノート"
 }

@@ -39,7 +39,7 @@ $can_create   ??= false;
 ])->render() ?>
 <?= Flash::fromQuery('error', [
     'empty_content' => __('notebook_error_empty_content'),
-    'forbidden'     => __('error_notebook_forbidden'),
+    'forbidden'     => __('notebook_error_forbidden'),
 ])->render() ?>
 
 <?php if ($can_create): ?>
@@ -83,7 +83,7 @@ echo Card::make()
 <?php endif; ?>
 
 <?php if (empty($entries)): ?>
-    <div class="empty-state"><?= __('no_notebook_entries') ?></div>
+    <div class="empty-state"><?= __('notebook_no_entries') ?></div>
 <?php else: ?>
     <ul class="notebook-widget-list">
         <?php foreach ($entries as $entry): ?>
