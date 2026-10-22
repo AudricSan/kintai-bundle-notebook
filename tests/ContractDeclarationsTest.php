@@ -33,8 +33,8 @@ final class ContractDeclarationsTest extends TestCase
         $this->assertCount(1, $features);
         $this->assertInstanceOf(StoreFeature::class, $features[0]);
         $this->assertSame('notes', $features[0]->key);
-        $this->assertSame('feature_notes', $features[0]->label);
-        $this->assertSame('feature_notes_desc', $features[0]->description);
+        $this->assertSame('notebook_feature_notes', $features[0]->label);
+        $this->assertSame('notebook_feature_notes_desc', $features[0]->description);
         $this->assertSame('📝', $features[0]->icon);
         $this->assertSame(90, $features[0]->order);
     }
@@ -54,9 +54,9 @@ final class ContractDeclarationsTest extends TestCase
             $this->assertNotNull($widget->data);
             $byAudience[$widget->audience] = $widget;
         }
-        $this->assertSame('widget_team_notes', $byAudience[DashboardWidget::MANAGER]->label);
+        $this->assertSame('notebook_widget_team_notes', $byAudience[DashboardWidget::MANAGER]->label);
         $this->assertSame('notebook::widgets.dashboard-manager', $byAudience[DashboardWidget::MANAGER]->view);
-        $this->assertSame('my_team_notes', $byAudience[DashboardWidget::EMPLOYEE]->label);
+        $this->assertSame('notebook_my_team_notes', $byAudience[DashboardWidget::EMPLOYEE]->label);
         $this->assertSame('notebook::widgets.dashboard-employee', $byAudience[DashboardWidget::EMPLOYEE]->view);
         $this->assertFileExists(dirname(__DIR__) . '/Views/widgets/dashboard-manager.php');
         $this->assertFileExists(dirname(__DIR__) . '/Views/widgets/dashboard-employee.php');
@@ -93,7 +93,7 @@ final class ContractDeclarationsTest extends TestCase
     /** Les libellés des déclarations et des widgets sont traduits par le bundle (le Core ne les fournit plus). */
     public function testDeclaredLabelsAreTranslatedByTheBundle(): void
     {
-        $keys = ['widget_team_notes', 'my_team_notes', 'no_notebook_entries', 'notebook_pinned', 'notebook_anonymous_author',
+        $keys = ['notebook_widget_team_notes', 'notebook_my_team_notes', 'notebook_no_entries', 'notebook_pinned', 'notebook_anonymous_author',
             'notebook_org_wide', 'notif_notebook_entry_created'];
         foreach (['fr', 'en', 'ja'] as $locale) {
             $lang = json_decode((string) file_get_contents(dirname(__DIR__) . "/lang/{$locale}.json"), true);
@@ -111,7 +111,7 @@ final class ContractDeclarationsTest extends TestCase
     {
         foreach (['fr', 'en', 'ja'] as $locale) {
             $lang = json_decode((string) file_get_contents(dirname(__DIR__) . "/lang/{$locale}.json"), true);
-            $this->assertNotSame($lang['widget_team_notes'], $lang['my_team_notes'], $locale);
+            $this->assertNotSame($lang['notebook_widget_team_notes'], $lang['notebook_my_team_notes'], $locale);
         }
     }
 }

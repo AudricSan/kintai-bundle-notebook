@@ -197,7 +197,7 @@ final class NotebookController
         // La route n'exige notebook.manage que « quelque part » : sans ce contrôle, le gérant d'un seul
         // magasin épinglait aussi les notes d'un autre magasin ou celles de toute l'organisation.
         if (!$this->canManageEntry($request->getAttribute('auth_user') ?? [], $entry['store_id'] !== null ? (int) $entry['store_id'] : null)) {
-            throw new \kintai\Contract\Exceptions\ForbiddenException(__('error_notebook_forbidden'));
+            throw new \kintai\Contract\Exceptions\ForbiddenException(__('notebook_error_forbidden'));
         }
         $entry['pinned'] = empty($entry['pinned']) ? 1 : 0;
         $this->notes->save($entry);
@@ -209,7 +209,7 @@ final class NotebookController
     {
         $entry = $this->notes->findById((int) $request->param('id'));
         if ($entry === null) {
-            throw new \kintai\Contract\Exceptions\NotFoundException(__('error_notebook_entry_not_found'));
+            throw new \kintai\Contract\Exceptions\NotFoundException(__('notebook_error_entry_not_found'));
         }
         if ($entry['store_id'] !== null) {
             $this->assertStoreAccess($request, (int) $entry['store_id']);
@@ -229,7 +229,7 @@ final class NotebookController
         if ($this->canManageEntry($user, $storeId)) {
             return;
         }
-        throw new \kintai\Contract\Exceptions\ForbiddenException(__('error_notebook_forbidden'));
+        throw new \kintai\Contract\Exceptions\ForbiddenException(__('notebook_error_forbidden'));
     }
 
     /**

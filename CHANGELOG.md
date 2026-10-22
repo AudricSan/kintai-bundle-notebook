@@ -9,6 +9,7 @@ Le schéma de version (X.Y.Z, canaux alpha/beta/main) est décrit dans
 ## [Unreleased]
 
 ### Changed
+- **Traductions conformes au contrat** : 8 clés renommées avec le préfixe du bundle (`notebook_…`), sans changement de texte affiché ; `tests/TranslationContractTest.php` impose désormais parité fr/en/ja, préfixe, collisions et clés connues.
 
 - Notifications (contrat 1.23, `kintai_contract` `^1.23`) : type `notebook_entry_created` déclaré au format enrichi (catégorie « messages », push par défaut, `reference_type` `notebook_entry`) ; le lien ouvre le carnet avec la note publiée en évidence (`?highlight=`) ; ouvrir le carnet marque comme lues les notifications des notes affichées.
 

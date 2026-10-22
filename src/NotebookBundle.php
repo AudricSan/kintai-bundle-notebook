@@ -64,7 +64,7 @@ final class NotebookBundle extends Bundle
      */
     public function storeFeatures(): array
     {
-        return [new StoreFeature('notes', 'feature_notes', 'feature_notes_desc', '📝', 90)];
+        return [new StoreFeature('notes', 'notebook_feature_notes', 'notebook_feature_notes_desc', '📝', 90)];
     }
 
     /**
@@ -79,9 +79,9 @@ final class NotebookBundle extends Bundle
         ];
 
         return [
-            new DashboardWidget('team_notes', DashboardWidget::MANAGER, 'widget_team_notes', 'notebook::widgets.dashboard-manager',
+            new DashboardWidget('team_notes', DashboardWidget::MANAGER, 'notebook_widget_team_notes', 'notebook::widgets.dashboard-manager',
                 $entries, permission: 'notebook.view', storeFeature: 'notes'),
-            new DashboardWidget('team_notes', DashboardWidget::EMPLOYEE, 'my_team_notes', 'notebook::widgets.dashboard-employee',
+            new DashboardWidget('team_notes', DashboardWidget::EMPLOYEE, 'notebook_my_team_notes', 'notebook::widgets.dashboard-employee',
                 $entries, permission: 'notebook.view', storeFeature: 'notes'),
         ];
     }

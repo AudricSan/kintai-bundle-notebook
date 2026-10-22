@@ -1,13 +1,13 @@
 {
     "bundle_notebook": "Notebook",
     "bundle_notebook_desc": "Team notebook — messages shown on the admin and employee dashboards, pinning, automatic expiration.",
-    "error_notebook_content_required": "The note content is required.",
-    "error_notebook_entry_not_found": "Note not found.",
-    "error_notebook_forbidden": "You're not allowed to perform this action on this note.",
-    "feature_notes": "Notebook",
-    "feature_notes_desc": "Team messages shown on the dashboard.",
-    "my_team_notes": "Notes from my stores",
-    "no_notebook_entries": "No notes yet.",
+    "notebook_error_content_required": "The note content is required.",
+    "notebook_error_entry_not_found": "Note not found.",
+    "notebook_error_forbidden": "You're not allowed to perform this action on this note.",
+    "notebook_feature_notes": "Notebook",
+    "notebook_feature_notes_desc": "Team messages shown on the dashboard.",
+    "notebook_my_team_notes": "Notes from my stores",
+    "notebook_no_entries": "No notes yet.",
     "notebook_anonymous_author": "Unknown author",
     "notebook_content": "Message",
     "notebook_created": "Note published.",
@@ -27,5 +27,5 @@
     "notif_notebook_entry_created": "New note",
     "notif_notebook_entry_created_body": "New note from :author: \":excerpt\"",
     "perm_category_notebook": "Notebook",
-    "widget_team_notes": "Team notes"
+    "notebook_widget_team_notes": "Team notes"
 }
