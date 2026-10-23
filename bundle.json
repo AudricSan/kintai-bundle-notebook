@@ -1,7 +1,7 @@
 {
     "slug": "notebook",
     "name": "Carnet de notes",
-    "version": "1.2.0",
+    "version": "2.0.0",
     "description": "Carnet de notes d'équipe — messages visibles sur les dashboards admin et employé, épinglage, expiration automatique.",
     "author": {
         "name": "AudricSan",
