@@ -1,11 +1,12 @@
 <?php
 
-use kintai\UI\Components\Badge;
-use kintai\UI\Components\Button;
-use kintai\UI\Components\Card;
-use kintai\UI\Components\Flash;
+use kintai\Contract\View\Components\Badge;
+use kintai\Contract\View\Components\Button;
+use kintai\Contract\View\Components\Card;
+use kintai\Contract\View\Components\Flash;
 
 /** @var array $entries */
+/** @var int   $highlight_id note désignée par une notification (0 = aucune) */
 /** @var array $stores_map        id → nom */
 /** @var array $store_ids         stores accessibles à l'utilisateur */
 /** @var bool  $can_global        peut poster une note "toute l'organisation" */
@@ -19,6 +20,10 @@ $can_global   ??= false;
 $show_expired ??= false;
 $can_create   ??= false;
 ?>
+
+<?php if ($notebookCss = bundle_asset('notebook', 'css/notebook.css')): ?>
+<link rel="stylesheet" href="<?= $notebookCss ?>">
+<?php endif; ?>
 
 <div class="page-header">
     <h2 class="page-header__title"><?= __('bundle_notebook') ?></h2>
@@ -34,7 +39,7 @@ $can_create   ??= false;
 ])->render() ?>
 <?= Flash::fromQuery('error', [
     'empty_content' => __('notebook_error_empty_content'),
-    'forbidden'     => __('error_notebook_forbidden'),
+    'forbidden'     => __('notebook_error_forbidden'),
 ])->render() ?>
 
 <?php if ($can_create): ?>
@@ -78,11 +83,11 @@ echo Card::make()
 <?php endif; ?>
 
 <?php if (empty($entries)): ?>
-    <div class="empty-state"><?= __('no_notebook_entries') ?></div>
+    <div class="empty-state"><?= __('notebook_no_entries') ?></div>
 <?php else: ?>
     <ul class="notebook-widget-list">
         <?php foreach ($entries as $entry): ?>
-            <li class="notebook-widget-item<?= !empty($entry['pinned']) ? ' notebook-widget-item--pinned' : '' ?>">
+            <li class="notebook-widget-item<?= !empty($entry['pinned']) ? ' notebook-widget-item--pinned' : '' ?><?= (int) ($highlight_id ?? 0) > 0 && (int) $entry['id'] === (int) $highlight_id ? ' notebook-widget-item--highlight' : '' ?>">
                 <?php if (!empty($entry['pinned'])): ?>
                     <span class="notebook-widget-item__pin" title="<?= htmlspecialchars(__('notebook_pinned')) ?>">📌</span>
                 <?php endif; ?>

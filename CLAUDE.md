@@ -171,3 +171,17 @@ and pushes the tag itself — never tag or `gh release create` by hand:
   `notebook_pinned`, `notebook_org_wide`, `notebook_anonymous_author` — used
   by the Core dashboard widgets this bundle's data feeds) are **not**
   redeclared here; only vocabulary exclusive to this bundle's own pages is.
+
+## Views and the Content Security Policy
+
+Kintai (Core 0.3.0+) sends `script-src 'self' 'nonce-…'`, without `'unsafe-inline'`. In `Views/` and any HTML
+built in `src/`, an inline event attribute (`onclick=`, `onchange=`, `onsubmit=`, `oninput=`…), a `javascript:`
+link or a `<script>` without a nonce is blocked by the browser **silently** — nothing fails on the server, so no
+other check would catch it. Write declarative attributes handled by the Core's `csp-actions.js` instead:
+`data-on-click="fn"` / `data-on-change="fn"` / `data-on-input="fn"` (+ `data-args='["a", "@value"]'`, with
+`@this`/`@value`/`@checked`), `data-submit-on-change`, `data-submit-form="id"`, `data-goto="url"`,
+`data-stop-propagation`, and `data-confirm="message"` on a form or a submit button (global confirmation modal).
+`data-on-*` only calls a function *you* defined on `window`; browser built-ins are refused on purpose. A needed
+inline script uses `<script nonce="<?= function_exists('csp_nonce') ? csp_nonce() : '' ?>">`. `Button::attrs()`
+already escapes values: pass raw ones. `tests.yml` fails when a violation reappears. Full reference: [Content
+Security Policy](https://github.com/AudricSan/Kintai/blob/develop/docs/creating-a-bundle.md#content-security-policy-no-inline-scripts) in Kintai's bundle guide.
